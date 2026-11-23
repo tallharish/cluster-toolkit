@@ -51,6 +51,15 @@ deployment_groups:
   # as a prefix. To refer to a local module, prefix with ./, ../ or /
   - id: network
     source: modules/network/vpc
+    settings:
+      firewall_rules:
+        - name: allow-external-ssh-icmp-login
+          direction: INGRESS
+          ranges: ["0.0.0.0/0"]
+          allow:
+            - protocol: tcp
+              ports: ["22"]
+            - protocol: icmp
 
   # Private Service Access (PSA) requires the compute.networkAdmin role which is
   # included in the Owner role, but not Editor.
