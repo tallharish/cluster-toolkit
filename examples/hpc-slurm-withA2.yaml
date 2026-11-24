@@ -16,31 +16,6 @@
 
 blueprint_name: hpc-slurm
 
-vars:
-  project_id:  ## Set GCP Project ID Here ##
-  deployment_name: hpc-slurm-with-a2
-  region: us-central1
-  zone: us-central1-a
-  # Optional overrides (defaults shown)
-  # Maximum number of dynamically provisioned nodes in the debug partition.
-  debug_node_count_dynamic_max: 4
-  # Machine type for the debug partition.
-  debug_machine_type: n2-standard-2
-  # Use Spot VMs for the debug partition.
-  debug_enable_spot_vm: false
-  # Maximum number of dynamically provisioned nodes in the compute partition.
-  compute_node_count_dynamic_max: 20
-  # Machine type for the compute partition.
-  compute_machine_type: c2-standard-60
-  # Use Spot VMs for the compute partition.
-  compute_enable_spot_vm: false
-  # Maximum number of dynamically provisioned nodes in the h3 partition.
-  h3_node_count_dynamic_max: 20
-  # Use Spot VMs for the h3 partition.
-  h3_enable_spot_vm: false
-  # Machine type for the login node.  
-  login_machine_type: n2-standard-4
-
 # Documentation for each of the modules used below can be found at
 # https://github.com/GoogleCloudPlatform/hpc-toolkit/blob/main/modules/README.md
 
@@ -133,20 +108,41 @@ deployment_groups:
     settings:
       partition_name: h3
       
-  - id: a2_nodeset
+  - id: a22_nodeset
     source: community/modules/compute/schedmd-slurm-gcp-v6-nodeset
     use: [network]
     settings:
       machine_type: a2-highgpu-2g
+      zones: [us-central1-a, us-central1-b, us-central1-c, us-central1-f]
+      zone_target_shape: ANY
       node_count_static: 0
       node_count_dynamic_max: 4
+      enable_spot_vm: true
       bandwidth_tier: gvnic_enabled
 
-  - id: a2_partition
+  - id: a22_partition
     source: community/modules/compute/schedmd-slurm-gcp-v6-partition
-    use: [a2_nodeset]
+    use: [a22_nodeset]
     settings:
-      partition_name: a2      
+      partition_name: a22
+ 
+  - id: a21_nodeset
+    source: community/modules/compute/schedmd-slurm-gcp-v6-nodeset
+    use: [network]
+    settings:
+      machine_type: a2-highgpu-1g
+      zones: [us-central1-a, us-central1-b, us-central1-c, us-central1-f]
+      zone_target_shape: ANY
+      node_count_static: 2
+      node_count_dynamic_max: 4
+      enable_spot_vm: true
+      bandwidth_tier: gvnic_enabled
+
+  - id: a21_partition
+    source: community/modules/compute/schedmd-slurm-gcp-v6-partition
+    use: [a21_nodeset]
+    settings:
+      partition_name: a21
 
   - id: slurm_login
     source: community/modules/scheduler/schedmd-slurm-gcp-v6-login
@@ -162,7 +158,8 @@ deployment_groups:
     - debug_partition
     - compute_partition
     - h3_partition
-    - a2_partition
+    - a22_partition
+    - a21_partition
     - homefs
     - slurm_login
     settings:
