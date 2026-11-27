@@ -118,6 +118,7 @@ deployment_groups:
       node_count_static: 0
       node_count_dynamic_max: 4
       enable_spot_vm: true
+      enable_placement: true
       bandwidth_tier: gvnic_enabled
 
   - id: a22_partition
@@ -133,9 +134,10 @@ deployment_groups:
       machine_type: a2-highgpu-1g
       zones: [us-central1-a, us-central1-b, us-central1-c, us-central1-f]
       zone_target_shape: ANY
-      node_count_static: 2
+      node_count_static: 0
       node_count_dynamic_max: 4
       enable_spot_vm: true
+      enable_placement: true
       bandwidth_tier: gvnic_enabled
 
   - id: a21_partition
@@ -143,6 +145,7 @@ deployment_groups:
     use: [a21_nodeset]
     settings:
       partition_name: a21
+      exclusive: false
 
   - id: slurm_login
     source: community/modules/scheduler/schedmd-slurm-gcp-v6-login
